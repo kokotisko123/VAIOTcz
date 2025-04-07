@@ -12,7 +12,7 @@ const PartnersSection = () => {
         <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mt-12">
           {/* ChatGPT */}
           <div className="flex items-center justify-center">
-            <div className="bg-white shadow-lg p-6 hover:shadow-xl transition-shadow duration-300 transform hover:-translate-y-1 w-full max-w-[180px] h-[100px] flex items-center justify-center px-[32px] py-[44px] my-[3px] mx-[36px] rounded-3xl">
+            <div className="bg-white shadow-lg p-6 hover:shadow-xl transition-shadow duration-300 transform hover:-translate-y-1 w-full max-w-[180px] h-[100px] flex items-center justify-center px-[32px] py-[44px] my-[3px] mx-[36px] rounded-2xl">
               <img alt="ChatGPT" className="max-h-10 max-w-full object-contain" src="/lovable-uploads/41f54b23-ba7c-443c-909b-316616ec8e5a.png" />
               <p className="ml-2 font-semibold text-gray-800">CHATGPT</p>
             </div>

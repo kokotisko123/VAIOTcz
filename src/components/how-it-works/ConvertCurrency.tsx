@@ -1,7 +1,11 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Button } from '../ui/button';
-import { RefreshCw } from 'lucide-react';
+import { RefreshCw, Loader2, Check } from 'lucide-react';
+import { useAuth, saveInvestment } from "@/hooks/useAuth";
+import { useNavigate } from "react-router-dom";
+import { useToast } from "@/hooks/use-toast";
+import { Input } from '../ui/input';
 
 interface ConvertCurrencyProps {
   isConnected: boolean;
@@ -26,6 +30,100 @@ const ConvertCurrency: React.FC<ConvertCurrencyProps> = ({
   onNextStep,
   setIsConnected
 }) => {
+  const [processing, setProcessing] = useState(false);
+  const [processingComplete, setProcessingComplete] = useState(false);
+  const navigate = useNavigate();
+  const { user } = useAuth();
+  const { toast } = useToast();
+  const [ethAmount, setEthAmount] = useState("");
+
+  // Update ETH amount when EUR amount changes
+  const handleEurChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setEurAmount(value);
+    
+    if (prices?.ethereum?.eur && value) {
+      const floatValue = parseFloat(value) || 0;
+      setEthAmount((floatValue / prices.ethereum.eur).toFixed(6));
+    }
+  };
+
+  // Process investment with a delay to simulate blockchain transaction
+  const handleInvest = async () => {
+    const ethValue = parseFloat(ethAmount);
+    const eurValue = parseFloat(eurAmount);
+
+    if (!user) {
+      toast({
+        title: "Authentication Required",
+        description: "Please sign in to make an investment",
+        variant: "destructive",
+      });
+      navigate("/auth");
+      return;
+    }
+
+    if (!ethAmount || !eurAmount || isNaN(ethValue) || isNaN(eurValue)) {
+      toast({
+        title: "Invalid Amount",
+        description: "Please enter a valid amount to invest",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (ethValue < 0.01) {
+      toast({
+        title: "Minimum Investment",
+        description: "The minimum investment amount is 0.01 ETH",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Save investment data with current timestamp
+    const investment = {
+      ethAmount: ethValue,
+      eurValue: eurValue,
+      timestamp: new Date().toISOString(),
+    };
+
+    setProcessing(true);
+    
+    // Simulate processing time (3 seconds)
+    await new Promise(resolve => setTimeout(resolve, 3000));
+    
+    try {
+      // Save to both localStorage and try to save to Supabase
+      if (user) {
+        await saveInvestment(user.id, investment);
+      }
+      
+      setProcessingComplete(true);
+      
+      toast({
+        title: "Investment Processed!",
+        description: `Your investment of ${investment.ethAmount} ETH (€${investment.eurValue}) has been successfully processed.`,
+      });
+      
+      // Wait another second before redirecting or completing
+      setTimeout(() => {
+        setProcessing(false);
+        setProcessingComplete(false);
+        onNextStep();
+      }, 1000);
+    } catch (error) {
+      console.error("Error saving investment:", error);
+      setProcessing(false);
+      
+      toast({
+        title: "Error",
+        description: "There was an error processing your investment. Please try again.",
+        variant: "destructive",
+      });
+    }
+  };
+
   return (
     <div className="flex flex-col items-center py-6">
       <div className="mb-8 w-full max-w-lg">
@@ -70,8 +168,25 @@ const ConvertCurrency: React.FC<ConvertCurrencyProps> = ({
                 className="focus:ring-investment-blue focus:border-investment-blue block w-full pl-8 pr-12 sm:text-sm border-gray-300 rounded-md py-3"
                 placeholder="0.00"
                 value={eurAmount}
-                onChange={(e) => setEurAmount(e.target.value)}
+                onChange={handleEurChange}
+                disabled={processing}
               />
+            </div>
+          </div>
+
+          <div>
+            <label htmlFor="ethAmount" className="block text-sm font-medium text-gray-700 mb-1">Amount in ETH</label>
+            <div className="relative">
+              <Input
+                id="ethAmount"
+                type="text"
+                value={ethAmount}
+                className="w-full pr-12"
+                disabled={true}
+              />
+              <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+                <span className="text-gray-500">ETH</span>
+              </div>
             </div>
           </div>
           
@@ -106,6 +221,22 @@ const ConvertCurrency: React.FC<ConvertCurrencyProps> = ({
               <span className="text-gray-700">{prices ? 'Just now' : 'Loading...'}</span>
             </div>
           </div>
+          
+          {processing && (
+            <div className="bg-green-50 p-4 rounded-lg flex items-center justify-center mt-4">
+              {!processingComplete ? (
+                <div className="flex items-center space-x-2">
+                  <Loader2 className="h-5 w-5 animate-spin text-green-600" />
+                  <span className="text-green-700 font-medium">Processing your investment...</span>
+                </div>
+              ) : (
+                <div className="flex items-center space-x-2">
+                  <Check className="h-5 w-5 text-green-600" />
+                  <span className="text-green-700 font-medium">Investment successfully processed!</span>
+                </div>
+              )}
+            </div>
+          )}
         </div>
       </div>
       
@@ -113,15 +244,16 @@ const ConvertCurrency: React.FC<ConvertCurrencyProps> = ({
         <Button 
           variant="outline"
           onClick={onPrevStep}
+          disabled={processing}
         >
           Back
         </Button>
         <Button 
-          className="btn-primary"
-          onClick={onNextStep}
-          disabled={!prices}
+          className="btn-primary bg-investment-blue hover:bg-blue-700"
+          onClick={handleInvest}
+          disabled={!prices || processing || !eurAmount || parseFloat(eurAmount) <= 0}
         >
-          Proceed to Transaction
+          Invest Now
         </Button>
       </div>
     </div>

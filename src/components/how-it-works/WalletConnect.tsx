@@ -1,161 +1,105 @@
-import React, { useState, useEffect } from "react";
-import { Wallet, Check, X } from "lucide-react";
-import StepHeader from "./StepHeader";
-import StepIndicator from "./StepIndicator";
-import { useToast } from "@/hooks/use-toast";
+import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
+import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/hooks/useAuth";
+import { useNavigate } from "react-router-dom";
+import { Loader2, Wallet } from "lucide-react";
 interface WalletConnectProps {
-  onComplete: () => void;
-  currentStep: number;
   loading?: boolean;
   selectedWallet?: string;
-  error?: Error;
   connectWallet?: (walletName: string) => void;
+  error?: Error | null;
+  onComplete?: () => void;
 }
-const WalletConnect = ({
-  onComplete,
-  currentStep
-}: WalletConnectProps) => {
-  const [connectionState, setConnectionState] = useState<"idle" | "connecting" | "success" | "error">("idle");
-  const [selectedWallet, setSelectedWallet] = useState<string>("");
+export default function WalletConnect({
+  loading,
+  selectedWallet,
+  connectWallet,
+  error,
+  onComplete
+}: WalletConnectProps = {}) {
+  const [isProcessing, setIsProcessing] = useState(false);
   const {
     toast
   } = useToast();
-
-  // This function would normally connect to the actual wallet
-  const connectWallet = async (walletName: string) => {
-    setSelectedWallet(walletName);
-    setConnectionState("connecting");
-    try {
-      // Check if window.ethereum or other wallet is available
-      if (window.ethereum && walletName === "MetaMask") {
-        try {
-          // Request account access
-          const accounts = await window.ethereum.request({
-            method: 'eth_requestAccounts'
-          });
-
-          // Successfully connected
-          handleSuccessfulConnection(walletName, accounts[0]);
-        } catch (error) {
-          console.error("Error connecting to MetaMask", error);
-          handleConnectionError();
-        }
-      } else {
-        // Simulate connection for demo purposes when real wallets aren't available
-        setTimeout(() => {
-          const success = Math.random() > 0.2;
-          if (success) {
-            handleSuccessfulConnection(walletName);
-          } else {
-            handleConnectionError();
-          }
-        }, 2000);
-      }
-    } catch (err) {
-      handleConnectionError();
+  const {
+    user
+  } = useAuth();
+  const navigate = useNavigate();
+  const handleConnectWallet = (walletProvider: string) => {
+    if (!user) {
+      toast({
+        title: "Authentication Required",
+        description: "Please sign in to connect your wallet",
+        variant: "destructive"
+      });
+      navigate("/auth");
+      return;
     }
-  };
-  const handleSuccessfulConnection = (walletName: string, account?: string) => {
-    setConnectionState("success");
-    toast({
-      title: `${walletName} Connected`,
-      description: account ? `Connected to account ${account.substring(0, 6)}...${account.substring(account.length - 4)}` : `Your ${walletName} wallet has been connected successfully.`
-    });
+    setIsProcessing(true);
+
+    // Simulate wallet connection process
     setTimeout(() => {
-      onComplete();
-    }, 1000);
+      setIsProcessing(false);
+      if (connectWallet) {
+        connectWallet(walletProvider);
+      }
+    }, 1500);
   };
-  const handleConnectionError = () => {
-    setConnectionState("error");
-    toast({
-      title: "Connection Failed",
-      description: "Failed to connect wallet. Please try again.",
-      variant: "destructive"
-    });
-    setTimeout(() => {
-      setConnectionState("idle");
-    }, 2000);
-  };
-  return <div className="flex flex-col items-center animate-fade-in">
-      <StepHeader icon={<Wallet className="h-5 w-5 text-white" />} title="Connect your wallet" description="First, connect your crypto wallet to begin the process." />
+  return <div className="w-full max-w-md mx-auto">
+      <div className="space-y-6">
+        <div className="text-center mb-6">
+          <h3 className="text-lg font-medium text-gray-900">Choose Your Wallet</h3>
+          <p className="text-gray-500 mt-1">Connect your preferred wallet to continue</p>
+        </div>
 
-      <div className="flex justify-center my-8 relative w-full">
-        <StepIndicator activeStep={currentStep} setActiveStep={() => {}} steps={[{
-        number: 1,
-        title: "Connect Wallet",
-        description: "Connect your crypto wallet",
-        icon: <Wallet className="h-5 w-5" />
-      }, {
-        number: 2,
-        title: "Convert Currency",
-        description: "Convert your currency",
-        icon: <Wallet className="h-5 w-5" />
-      }, {
-        number: 3,
-        title: "Complete Transaction",
-        description: "Finalize your investment",
-        icon: <Wallet className="h-5 w-5" />
-      }]} />
-      </div>
-
-      <div className="bg-card shadow-lg rounded-xl p-8 max-w-md w-full mx-auto border border-border">
-        <h3 className="text-2xl font-bold text-center mb-6">Wallet Connection</h3>
-        
-        <p className="text-center text-muted-foreground mb-8">
-          Please connect your wallet to continue with the VAIOT investment process. 
-          We support MetaMask, WalletConnect, and other popular providers.
-        </p>
-
-        <div className="grid grid-cols-2 gap-4 mb-6">
-          <Button onClick={() => connectWallet("MetaMask")} disabled={connectionState === "connecting" || connectionState === "success"} variant="outline" className="p-4 h-auto flex flex-col items-center justify-center">
-            <img src="https://upload.wikimedia.org/wikipedia/commons/3/36/MetaMask_Fox.svg" alt="MetaMask" className="w-10 h-10 mb-2" />
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+          <Button onClick={() => handleConnectWallet("MetaMask")} disabled={isProcessing || loading} variant="outline" className="py-6 border-2 hover:border-blue-500 hover:bg-blue-50 flex flex-col items-center justify-center h-[120px]">
+            <div className="w-12 h-12 mb-2 flex items-center justify-center">
+              <img src="https://upload.wikimedia.org/wikipedia/commons/3/36/MetaMask_Fox.svg" alt="MetaMask" className="w-10 h-10" />
+            </div>
             <span>MetaMask</span>
           </Button>
-          
-          <Button onClick={() => connectWallet("WalletConnect")} disabled={connectionState === "connecting" || connectionState === "success"} variant="outline" className="p-4 h-auto flex flex-col items-center justify-center">
-            <img alt="WalletConnect" className="w-10 h-10 mb-2" src="/lovable-uploads/f3e6edfa-3446-4651-a44f-962c8c96d94b.png" />
-            <span>WalletConnect</span>
-          </Button>
-          
-          <Button onClick={() => connectWallet("Trust Wallet")} disabled={connectionState === "connecting" || connectionState === "success"} variant="outline" className="p-4 h-auto flex flex-col items-center justify-center">
-            <img alt="Trust Wallet" className="w-10 h-10 mb-2" src="/lovable-uploads/fc154f11-62ec-422a-996c-c3c7db6c01e2.jpg" />
+
+          <Button onClick={() => handleConnectWallet("TrustWallet")} disabled={isProcessing || loading} variant="outline" className="py-6 border-2 hover:border-blue-500 hover:bg-blue-50 flex flex-col items-center justify-center h-[120px]">
+            <div className="w-12 h-12 mb-2 flex items-center justify-center">
+              <img alt="Trust Wallet" className="w-10 h-10" src="/lovable-uploads/669d9847-093a-49d5-b629-5fa45399b93a.png" />
+            </div>
             <span>Trust Wallet</span>
           </Button>
-          
-          <Button onClick={() => connectWallet("Exodus")} disabled={connectionState === "connecting" || connectionState === "success"} variant="outline" className="p-4 h-auto flex flex-col items-center justify-center">
-            <img alt="Exodus" className="w-10 h-10 mb-2 rounded-full" src="/lovable-uploads/4e5af014-423d-4291-b7d4-7155d0ece050.png" />
-            <span>Exodus</span>
+
+          <Button onClick={() => handleConnectWallet("CoinbaseWallet")} disabled={isProcessing || loading} variant="outline" className="py-6 border-2 hover:border-blue-500 hover:bg-blue-50 flex flex-col items-center justify-center h-[120px]">
+            <div className="w-12 h-12 mb-2 flex items-center justify-center">
+              <img alt="Coinbase Wallet" className="w-10 h-10" src="/lovable-uploads/cbf3d8f1-efab-4a33-ab5b-4874be6a7d6e.png" />
+            </div>
+            <span>Coinbase Wallet</span>
+          </Button>
+
+          <Button onClick={() => handleConnectWallet("WalletConnect")} disabled={isProcessing || loading} variant="outline" className="py-6 border-2 hover:border-blue-500 hover:bg-blue-50 flex flex-col items-center justify-center h-[120px]">
+            <div className="w-12 h-12 mb-2 flex items-center justify-center">
+              <img alt="WalletConnect" className="w-10 h-10" src="/lovable-uploads/942fc209-49d8-4f18-9cac-c5afdd790780.png" />
+            </div>
+            <span>WalletConnect</span>
           </Button>
         </div>
 
-        {connectionState === "connecting" && <div className="text-center py-4 animate-pulse">
-            <div className="inline-block w-8 h-8 border-4 border-t-blue-500 border-r-transparent border-b-transparent border-l-transparent rounded-full animate-spin mb-2"></div>
-            <p className="text-sm text-muted-foreground">
-              Connecting to {selectedWallet}...
-            </p>
-            <p className="text-xs text-muted-foreground mt-1">
-              Please confirm the connection in your wallet
-            </p>
+        {isProcessing && <div className="mt-6 text-center p-4 bg-blue-50 rounded-lg">
+            <div className="flex justify-center items-center space-x-2">
+              <Loader2 className="h-5 w-5 animate-spin text-blue-600" />
+              <span className="text-blue-700 font-medium">Connecting wallet...</span>
+            </div>
           </div>}
-        
-        {connectionState === "success" && <div className="text-center py-4 animate-fade-in text-green-500 flex items-center justify-center">
-            <Check className="mr-2" />
-            <span>Successfully connected to {selectedWallet}</span>
+
+        {error && <div className="bg-red-50 p-4 rounded-lg mt-4">
+            <p className="text-red-700 text-center">Error connecting to wallet: {error.message}</p>
           </div>}
-        
-        {connectionState === "error" && <div className="text-center py-4 animate-fade-in text-red-500 flex items-center justify-center">
-            <X className="mr-2" />
-            <span>Failed to connect. Please try again.</span>
+
+        {selectedWallet && <div className="bg-green-50 p-4 rounded-lg mt-4 flex items-center justify-center space-x-2">
+            <div className="flex items-center space-x-2">
+              <Wallet className="h-5 w-5 text-green-600" />
+              <span className="text-green-700 font-medium">Connected with {selectedWallet}</span>
+            </div>
           </div>}
       </div>
     </div>;
-};
-
-// Add this for TypeScript
-declare global {
-  interface Window {
-    ethereum?: any;
-  }
 }
-export default WalletConnect;

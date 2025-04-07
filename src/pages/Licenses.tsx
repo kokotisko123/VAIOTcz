@@ -10,7 +10,7 @@ const Licenses = () => {
   return (
     <div className="min-h-screen flex flex-col">
       <Navbar />
-
+      
       <main className="flex-grow pt-24 pb-16">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="mb-8">
@@ -20,15 +20,15 @@ const Licenses = () => {
                 Back to Home
               </Button>
             </Link>
-
+            
             <h1 className="text-3xl md:text-4xl font-bold mb-6 text-investment-dark">Regulatory Licenses</h1>
             <div className="h-1 w-20 bg-investment-accent mb-8"></div>
-
+            
             <p className="text-lg text-gray-700 mb-8">
               VAIOT operates under official licenses granted by national regulatory authorities, ensuring compliance with financial regulations and providing security for our users.
             </p>
           </div>
-
+          
           <div className="grid grid-cols-1 md:grid-cols-2 gap-12 mb-16">
             <div className="bg-white rounded-xl shadow-md p-8 border border-gray-100">
               <div className="flex justify-between items-start mb-6">
@@ -41,13 +41,13 @@ const Licenses = () => {
                   <span className="text-xs font-medium">Verified</span>
                 </div>
               </div>
-
+              
               <div className="mb-6 flex justify-center">
                 <div className="border border-gray-200 rounded-lg p-4 w-48 h-48 flex items-center justify-center">
-                  <img src="/cnb-logo.png" alt="ČNB Logo" className="w-full h-full object-contain" />
+                  <img src="/cnb-logo.png" alt="NBS Logo" className="w-full h-full object-contain" />
                 </div>
               </div>
-
+              
               <div>
                 <h3 className="font-semibold mb-2">License Details:</h3>
                 <ul className="space-y-2 text-gray-700">
@@ -66,7 +66,7 @@ const Licenses = () => {
                 </ul>
               </div>
             </div>
-
+            
             <div className="bg-white rounded-xl shadow-md p-8 border border-gray-100">
               <div className="flex justify-between items-start mb-6">
                 <div>
@@ -78,13 +78,13 @@ const Licenses = () => {
                   <span className="text-xs font-medium">Verified</span>
                 </div>
               </div>
-
+              
               <div className="mb-6 flex justify-center">
                 <div className="border border-gray-200 rounded-lg p-4 w-48 h-48 flex items-center justify-center">
-                  <img src="/nbs-logo.png" alt="NBS Logo" className="w-full h-full object-contain" />
+                <img src="/nbs-logo.png" alt="NBS Logo" className="w-full h-full object-contain" />
                 </div>
               </div>
-
+              
               <div>
                 <h3 className="font-semibold mb-2">License Details:</h3>
                 <ul className="space-y-2 text-gray-700">
@@ -104,7 +104,7 @@ const Licenses = () => {
               </div>
             </div>
           </div>
-
+          
           <div className="bg-gray-50 rounded-xl p-8 mb-12">
             <h2 className="text-2xl font-semibold mb-4">What Our Licenses Mean For You</h2>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -124,7 +124,7 @@ const Licenses = () => {
           </div>
         </div>
       </main>
-
+      
       <Footer />
     </div>
   );
