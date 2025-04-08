@@ -44,7 +44,7 @@ const Licenses = () => {
               
               <div className="mb-6 flex justify-center">
                 <div className="border border-gray-200 rounded-lg p-4 w-48 h-48 flex items-center justify-center">
-                  <img src="/cnb-logo.png" alt="NBS Logo" className="w-full h-full object-contain" />
+                  <div className="text-gray-400 text-center">ČNB Logo Placeholder</div>
                 </div>
               </div>
               
@@ -81,7 +81,7 @@ const Licenses = () => {
               
               <div className="mb-6 flex justify-center">
                 <div className="border border-gray-200 rounded-lg p-4 w-48 h-48 flex items-center justify-center">
-                <img src="/nbs-logo.png" alt="NBS Logo" className="w-full h-full object-contain" />
+                  <div className="text-gray-400 text-center">NBS Logo Placeholder</div>
                 </div>
               </div>
               

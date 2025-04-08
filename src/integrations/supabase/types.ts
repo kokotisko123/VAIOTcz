@@ -108,6 +108,48 @@ export type Database = {
         }
         Relationships: []
       }
+      stakes: {
+        Row: {
+          amount: number
+          apy: number
+          created_at: string
+          id: string
+          period: number
+          projected_reward: number
+          start_date: string
+          status: string
+          unlock_date: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          amount: number
+          apy: number
+          created_at?: string
+          id?: string
+          period: number
+          projected_reward: number
+          start_date?: string
+          status?: string
+          unlock_date: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          amount?: number
+          apy?: number
+          created_at?: string
+          id?: string
+          period?: number
+          projected_reward?: number
+          start_date?: string
+          status?: string
+          unlock_date?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
