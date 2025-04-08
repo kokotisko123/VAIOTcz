@@ -11,11 +11,12 @@ import {
   ArrowUpRight, Wallet, LineChart, PieChart as PieChartIcon, 
   Landmark, Bell, User as UserIcon, Settings, LogOut, 
   DollarSign, ArrowUpRightFromCircle, ShieldCheck, AlertTriangle,
-  Award
+  Award, FileText, Trash2, Info
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useCryptoPrices } from "@/hooks/useCryptoPrices";
 import StakingTab from "@/components/dashboard/StakingTab";
+import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator } from "@/components/ui/dropdown-menu";
 
 interface Portfolio {
   id: string;
@@ -334,10 +335,39 @@ const Dashboard: React.FC = () => {
               <button className="p-2 rounded-full bg-white/10 hover:bg-white/20">
                 <Bell size={18} />
               </button>
-              <div className="flex items-center bg-white/10 rounded-full px-3 py-1">
-                <UserIcon size={18} className="mr-2" />
-                <span className="font-medium">{profile?.full_name || "Investor"}</span>
-              </div>
+              
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <div className="flex items-center bg-white/10 rounded-full px-3 py-1 cursor-pointer hover:bg-white/20">
+                    <UserIcon size={18} className="mr-2" />
+                    <span className="font-medium">{profile?.full_name || "Investor"}</span>
+                  </div>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-56">
+                  <div className="px-2 py-1.5 text-sm font-medium text-gray-900">
+                    My Account
+                  </div>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={() => navigate('/profile')}>
+                    <Info className="mr-2 h-4 w-4" />
+                    <span>Account Info</span>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => navigate('/withdrawals')}>
+                    <FileText className="mr-2 h-4 w-4" />
+                    <span>Withdrawal Requests</span>
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={() => navigate('/account-settings')} className="text-amber-600">
+                    <Trash2 className="mr-2 h-4 w-4" />
+                    <span>Account Settings</span>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={handleSignOut} className="text-red-600">
+                    <LogOut className="mr-2 h-4 w-4" />
+                    <span>Sign Out</span>
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+              
               <Button 
                 variant="outline" 
                 size="sm"

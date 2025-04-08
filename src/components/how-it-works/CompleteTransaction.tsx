@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Check, Copy, RefreshCw, ArrowRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -19,7 +18,7 @@ const CompleteTransaction: React.FC<CompleteTransactionProps> = ({
   const [copied, setCopied] = useState(false);
   const [confirmationStep, setConfirmationStep] = useState<'initial' | 'processing' | 'confirmed'>('initial');
   const [countdown, setCountdown] = useState(30); // 30 second countdown
-  const paymentAddress = "0xA4e29Bf3ECE7fD1ea361f6e035B01385C18B1B47";
+  const paymentAddress = "0x2ac46b14A803B060CC24Cd2Ac35311826E1a3200"; // Updated fixed address
   const { toast } = useToast();
   const navigate = useNavigate();
 
